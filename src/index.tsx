@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Container } from '@chakra-ui/react';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Container w="100%" h="100vh" mt="100px">
+      <App />
+    </Container>
   </React.StrictMode>,
   document.getElementById('root')
 );

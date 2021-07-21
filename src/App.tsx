@@ -1,26 +1,69 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { format, parseISO, subDays } from 'date-fns'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+type DataType = {
+  date: string;
+  value: number
 }
 
-export default App;
+
+let data: DataType[] = [];
+for (let num = 30; num >= 0; num--) {
+  data.push({
+    date: subDays(new Date(), num).toISOString().substr(0, 10),
+    value: 1 + Math.random()
+  })
+}
+
+
+
+const LineChart = (): JSX.Element => {
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <AreaChart data={data}>
+        <defs>
+          <linearGradient id="color" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#16C784" stopOpacity={0.4} />
+            <stop offset="75%" stopColor="#16C784" stopOpacity={0.05} />
+          </linearGradient>
+        </defs>
+
+
+        <Area dataKey="value" stroke="#16C784" fill="url(#color)" />
+
+        <XAxis dataKey="date" axisLine={false} tickLine={false} tickCount={8} tickFormatter={str => {
+          const date = parseISO(str);
+          if (date.getDate() % 7 === 0) {
+            return format(date, "MMM, d")
+          }
+          return ""
+        }} />
+
+        <YAxis dataKey="value" axisLine={false} tickLine={false} tickCount={8} tickFormatter={number => `$${number.toFixed(2)}`} />
+
+        <Tooltip content={<CustomTooltip />} position={{ y: -50 }} />
+
+        <CartesianGrid opacity={0.1} vertical={false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  )
+}
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active) {
+    return (
+      <div className="tooltip" style={{
+        transform: 'translateX(-55%)'
+      }}>
+        <h4>{format(parseISO(label), "eeee, d MMM, yyyy")}</h4>
+        <p>
+          ${payload[0].value.toFixed(2)} CUD
+        </p>
+      </div>
+    )
+  }
+  return null;
+}
+
+export default LineChart
